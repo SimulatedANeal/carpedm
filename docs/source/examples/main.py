@@ -25,7 +25,7 @@ from carpedm.util import registry
 tf.logging.set_verbosity(tf.logging.INFO)
 
 # Task definition
-args = {'data_dir': dm.data.SAMPLE,
+args = {'data_dir': dm.data.sample,
         'task_dir': '/tmp/carpedm_tasks',
         'shape_store': None,
         'shape_in': (64, 64)}
@@ -34,7 +34,7 @@ task = registry.task('ocr_single_kana')(**args)
 # Training Hyperparameters
 num_epochs = 30
 training_hparams = {'train_batch_size': 32,
-                    'eval_batch_size': 71,
+                    'eval_batch_size': 1,
                     'data_format': 'channels_last',
                     'optimizer': 'sgd',
                     'learning_rate': 1e-3,
