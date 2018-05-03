@@ -1,4 +1,6 @@
-<div align="center"><img src="docs/image/carpedm_logo.png" width="400"/></div>
+.. image:: docs/image/carpedm_logo.png
+    :alt: Logo
+    :align: center
 
 *******************************
 CarpeDM: Sieze the Data Manager
@@ -31,11 +33,12 @@ Description
 Originally developed as a ChARacter shaPE Data Manager, CarpeDM aims to make Japanese character shape (字形) data
 and other image datasets more accessible to machine learning researchers.
 
-.. csv-table:: **Datasets Currently Available for Download**
+.. csv-table:: Datasets Currently Available for Download
     :header: "ID", "Dataset"
     :widths: 10, 80
 
-    "e", "`Pre-Modern Japanese Text Character Shapes Dataset (日本古典籍字形データセット) <http://codh.rois.ac.jp/char-shape/>`_, provided by the Center of Open Data in the Humanities (CODH)."
+    "pmjtc", "| `Pre-Modern Japanese Text Character Shapes Dataset (日本古典籍字形データセット) <http://codh.rois.ac.jp/char-shape/>`_,
+    | provided by the Center for Open Data in the Humanities (CODH)."
 
 Though still in the early stages of development, a high-level interface is also provided
 for (1) automatic model-ready data generation and (2) flexible training of models with a variety of
