@@ -1,0 +1,8 @@
+include AUTHORS.md CHANGES.md DESCRIPTION.rst LICENSE
+include docs/image/interface.png
+include carpedm/data/HiraginoMaruGothic.ttc
+recursive-include carpedm/data/small *
+recursive-exclude carpedm/data/small *.DS_Store
+recursive-include test *
+recursive-exclude test *.pyc
+recursive-exclude test *.pyo
