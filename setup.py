@@ -55,6 +55,10 @@ setup(name='carpedm',
           'tfgpu': [
               'tensorflow-gpu>1.5',
           ],
+          'docs': [
+              'sphinx >= 1.7',
+              'sphinx_rtd_theme',
+          ]
       },
       tests_require=[
           'nose',
