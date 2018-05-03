@@ -14,9 +14,9 @@ CarpeDM: Sieze the Data Manager
     :target: https://pypi.python.org/pypi/carpedm/
     :alt: License
 
-.. image:: https://readthedocs.org/projects/carpedm/badge/
-    :target: http://carpedm.readthedocs.io/en/latest/
-    :alt: Docs
+.. image:: https://readthedocs.org/projects/carpedm/badge/?version=latest
+    :target: http://carpedm.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
 
 `Docs <http://carpedm.readthedocs.io/en/latest/>`_
 | `Install Guide <http://carpedm.readthedocs.io/en/latest/install.html>`_
