@@ -2,25 +2,27 @@
 CarpeDM: Sieze the Data Manager
 *******************************
 
-.. image:: https://pypip.in/version/carpedm/badge.png
-    :target: https://pypi.python.org/pypi/carpedm/
-    :alt: Latest Version
+.. only:: html
 
-.. image:: https://travis-ci.org/SimulatedANeal/carpedm.png
-    :target: https://travis-ci.org/SimulatedANeal/carpedm
-    :alt: Continuous Integration Testing
+    .. image:: https://pypip.in/version/carpedm/badge.png
+        :target: https://pypi.python.org/pypi/carpedm/
+        :alt: Latest Version
 
-.. image:: https://pypip.in/license/carpedm/badge.png
-    :target: https://pypi.python.org/pypi/carpedm/
-    :alt: License
+    .. image:: https://travis-ci.org/SimulatedANeal/carpedm.png
+        :target: https://travis-ci.org/SimulatedANeal/carpedm
+        :alt: Continuous Integration Testing
 
-.. image:: https://readthedocs.org/projects/carpedm/badge/?version=latest
-    :target: http://carpedm.readthedocs.io/en/latest/?badge=latest
-    :alt: Documentation Status
+    .. image:: https://pypip.in/license/carpedm/badge.png
+        :target: https://pypi.python.org/pypi/carpedm/
+        :alt: License
 
-`Docs <http://carpedm.readthedocs.io/en/latest/>`_
-| `Install Guide <http://carpedm.readthedocs.io/en/latest/install.html>`_
-| `Tutorial <http://carpedm.readthedocs.io/en/latest/guides/usage.html>`_
+    .. image:: https://readthedocs.org/projects/carpedm/badge/?version=latest
+        :target: http://carpedm.readthedocs.io/en/latest/?badge=latest
+        :alt: Documentation Status
+
+    `Docs <http://carpedm.readthedocs.io/en/latest/>`_
+    | `Install Guide <http://carpedm.readthedocs.io/en/latest/install.html>`_
+    | `Tutorial <http://carpedm.readthedocs.io/en/latest/guides/usage.html>`_
 
 Description
 ===========
