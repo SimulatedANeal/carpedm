@@ -5,6 +5,7 @@ python:
   - "3.5"
   - "3.6"
 install:
+  - pip install tensorflow
   - pip install .
   - pip install nose
   - pip install matplotlib
