@@ -299,6 +299,7 @@ class Task(object):
             (bool): Use sparse labels.
 
         """
+        return False
 
     # ====================== END TASK INTERFACE ====================== #
 
@@ -347,9 +348,9 @@ class Task(object):
             out_dir=self.task_data_dir, subset=subset, target_id=self.target,
             num_shards=self._num_shards, num_threads=self._num_threads,
             format_store=self._dataset_format, shape_store=self._shape_store,
-            shape_in=self._shape_in, chunk=self.chunk, character=self.character,
-            line=self.line, label=self.label, bbox=self.bbox,
-            overwrite=overwrite)
+            shape_in=self._shape_in, sparse_labels=self.sparse_labels,
+            chunk=self.chunk, character=self.character, line=self.line,
+            label=self.label, bbox=self.bbox, overwrite=overwrite)
 
         self._original_format = dataset.format
 

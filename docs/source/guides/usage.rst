@@ -150,26 +150,11 @@ At the end of 30 epochs, it achieved a development set accuracy of **65.27%**. N
 And considering the **70** character classes and **4.19%** majority class for this task and specific dataset, we are already doing much better than chance!
 
 Running this same code for the *full* currently available PMJTC dataset takes much longer but---as you would expect when
-adding more data---achieves a higher accuracy. Though certainly indicative of the benefit of more data,
-note that the accuracies presented below are not a fair comparison to the one above for two reasons:
+adding more data---achieves a higher accuracy (see :ref:`benchmarks`). Though certainly indicative of the benefit of more data,
+note that the accuracies presented in the benchmarks are not a fair comparison to the one above for two reasons:
 
     1. There are more kana character classes in the full dataset: **131**
     2. The development sets on which accuracies are reported are different.
-
-Benchmarks
-~~~~~~~~~~
-
-Running the example :ref:`main.py <main>` for the full PMJTC dataset (171,944 training examples, as of 2 May 2018)
-
-* On a 2017 MacBook Pro:
-    * Generating the (train & dev) data: 1 hour, 20 minutes
-    * Training the model for 5 epochs: 2 hours, 27 minutes
-    * Dev Accuracy: 94.67%
-
-* On a Linux Machine using 1 Titan X (Pascal) GPU:
-    * Generating the (train & dev) data: 31 minutes
-    * Training the model for 5 epochs: 21 minutes
-    * Dev Accuracy: 95.23%
 
 Conclusion
 ~~~~~~~~~~
