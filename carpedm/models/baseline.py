@@ -51,3 +51,31 @@ class SingleCharBaseline(TFModel):
         logits = tf.layers.dense(
             inputs=x, units=self._num_classes, name='logits')
         return logits
+
+
+class MultiCharBaseline(TFModel):
+    """
+
+    """
+
+    def __init__(self, num_classes, lstm_layers=2, lstm_units=100,
+                 feature_extractor=nn.conv.CNN(), *args, **kwargs):
+        self._num_classes = num_classes
+        self._layers = lstm_layers
+        self._units = lstm_units
+        self._feature_extractor = feature_extractor
+
+    def _forward_pass(self, features, data_format, axes_order,
+                      is_training, reuse):
+        x = self._feature_extractor.forward_pass(
+            features, data_format, axes_order, is_training, False, reuse)
+        print(x.shape)
+        x = nn.rnn.bi_lstm(x, n_layers=self._layers, n_units=self._units)
+        seq_len = None  # TODO
+        logits = tf.layers.dense(inputs=x, units=self._num_classes)
+
+    def initialize_pretrained(self, pretrained_dir):
+
+        variable_mapping = None  # TODO
+
+        return variable_mapping
