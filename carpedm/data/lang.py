@@ -189,11 +189,16 @@ class Vocabulary(object):
             self._vocab[self.UNK] = len(self._vocab)
         self._rev_vocab = {idx: key for key, idx in self._vocab.items()}
 
-    def save(self, out_dir):
+    def save(self, out_dir, as_unicode=False):
         vocab_sorted = [self._rev_vocab[idx]
                         for idx in sorted(self._rev_vocab.keys())]
         with open(os.path.join(out_dir, 'vocab.txt'), 'w') as f:
             for token in vocab_sorted:
+                if as_unicode:
+                    try:
+                        token = code2char(token)
+                    except ValueError:
+                        token = token
                 f.write(token + '\n')
 
     def char_to_id(self, char):
