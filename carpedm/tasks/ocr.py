@@ -17,7 +17,7 @@ import tensorflow as tf
 
 from carpedm.tasks.generic import Task
 from carpedm.util import registry
-from carpedm.util.eval import confusion_matrix
+from carpedm.util.eval import confusion_matrix_metric
 
 
 class OCRTask(Task):
@@ -91,11 +91,12 @@ class OCRSingleKana(OCRTask):
         }
 
         stacked_labels = tf.squeeze(tf.concat(tower_targets, axis=0))
-        confusion_matrix(
-            stacked_labels, predictions['classes'], self.num_classes)
+
         accuracy = tf.metrics.accuracy(stacked_labels, predictions['classes'])
         metrics = {
-            'accuracy' if is_training else 'accuracy': accuracy
+            'accuracy': accuracy,
+            'confusion': confusion_matrix_metric(
+                stacked_labels, predictions['classes'], self.num_classes)
         }
 
         return tensors_to_log, predictions, metrics

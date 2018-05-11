@@ -329,6 +329,9 @@ class Task(object):
                                  self.character_set,
                                  num_classes)
 
+    def get_class_labels(self, as_unicode=False):
+        return self._meta.vocab.types(as_unicode)
+
     def input_fn(self, batch_size, subset, num_shards, overwrite=False):
         """Returns (sharded) batches of data.
 

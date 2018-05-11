@@ -22,7 +22,11 @@ def code2hex(unicode):
 
 def code2char(unicode):
     """Returns the unicode string for the character."""
-    return chr(code2hex(unicode))
+    try:
+        char = chr(code2hex(unicode))
+    except ValueError:
+        char = unicode
+    return char
 
 
 class CharacterSet(object):
@@ -190,18 +194,16 @@ class Vocabulary(object):
         self._rev_vocab = {idx: key for key, idx in self._vocab.items()}
 
     def save(self, out_dir, as_unicode=False):
-        types = self.types()
+        types = self.types(as_unicode)
         with open(os.path.join(out_dir, 'vocab.txt'), 'w') as f:
-            for token in types:
-                if as_unicode:
-                    try:
-                        token = code2char(token)
-                    except ValueError:
-                        token = token
-                f.write(token + '\n')
+            for t in types:
+                f.write(t + '\n')
 
-    def types(self):
-        return [self._rev_vocab[idx] for idx in sorted(self._rev_vocab.keys())]
+    def types(self, as_unicode=False):
+        types = [code2char(self._rev_vocab[idx]) if as_unicode
+                 else self._rev_vocab[idx]
+                 for idx in sorted(self._rev_vocab.keys())]
+        return types
 
     def char_to_id(self, char):
         """Returns the integer id of a character string."""

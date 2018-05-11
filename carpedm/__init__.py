@@ -11,4 +11,4 @@ from carpedm import tasks
 from carpedm import nn
 from carpedm import util
 
-__version__ = '0.1.2'
+__version__ = '0.1.3'
