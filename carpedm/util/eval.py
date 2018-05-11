@@ -11,14 +11,16 @@ import tensorflow as tf
 
 
 def confusion_matrix_metric(labels, predictions, num_classes):
-    """
+    """A confusion matrix metric.
 
     Args:
-        self:
-        labels:
-        predictions:
+        labels (tf.Tensor): Ground truth labels.
+        predictions (tf.Tensor): Predictions.
+        num_classes (int): Number of classs.
 
     Returns:
+        tf.Tensor:
+        tf.update_op:
 
     """
     confusion = tf.get_variable(name='confusion',
@@ -45,6 +47,8 @@ def plot_confusion_matrix(cm, classes,
     """
     This function prints and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.
+    
+    Slight modification of methods `here <http://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html>`_
     """
     import matplotlib.pyplot as plt
     from carpedm.data import font
