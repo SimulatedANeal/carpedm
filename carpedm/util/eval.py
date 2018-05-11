@@ -40,7 +40,7 @@ def confusion_matrix_metric(labels, predictions, num_classes):
 
 
 def plot_confusion_matrix(cm, classes,
-                          normalize=False,
+                          normalize=False, save_as=None,
                           title='Confusion matrix'):
     """
     This function prints and plots the confusion matrix.
@@ -57,12 +57,13 @@ def plot_confusion_matrix(cm, classes,
 
     print(cm)
 
+    plt.figure(figsize=(20,20))
     plt.imshow(cm, interpolation='nearest')
     plt.title(title)
     plt.colorbar()
     tick_marks = np.arange(len(classes))
-    plt.xticks(tick_marks, classes, rotation=45, fontproperties=font(6))
-    plt.yticks(tick_marks, classes, fontproperties=font(6))
+    plt.xticks(tick_marks, classes, rotation=45, fontproperties=font(8))
+    plt.yticks(tick_marks, classes, fontproperties=font(8))
 
     # fmt = '.2f' if normalize else 'd'
     # thresh = cm.max() / 2.
@@ -74,4 +75,6 @@ def plot_confusion_matrix(cm, classes,
     plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
+    if save_as:
+        plt.savefig(save_as)
     plt.show()
