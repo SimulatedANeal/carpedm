@@ -2,6 +2,12 @@
 
 Notable changes between releases.
 
+## 0.1.4 (2018-05-13)
+* Improved `view_images` UI
+    * Separated toolbar
+    * filter by image or character
+* Moved `font` to viewer
+
 ## 0.1.3 (2018-05-11)
 * Added utils for accumulating and displaying confusion matrix
 * types() method for Vocabulary

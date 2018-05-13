@@ -13,20 +13,25 @@ import abc
 import os
 
 
-def code2hex(unicode):
+def code2hex(code):
     """Returns hex integer for a unicode string."""
-    if 'U+' in unicode:
-        unicode = unicode.lstrip('U+')
-    return int(unicode, 16)
+    if 'U+' in code:
+        code = code.lstrip('U+')
+    return int(code, 16)
 
 
-def code2char(unicode):
+def code2char(code):
     """Returns the unicode string for the character."""
     try:
-        char = chr(code2hex(unicode))
+        char = chr(code2hex(code))
     except ValueError:
-        char = unicode
+        char = code
     return char
+
+
+# def char2code(unicode):
+#     """Returns the ASCII code for a unicode character."""
+#     pass
 
 
 class CharacterSet(object):
