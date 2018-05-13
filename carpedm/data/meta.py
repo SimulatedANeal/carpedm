@@ -89,7 +89,6 @@ from carpedm.data.download import get_books_list
 from carpedm.data.providers import TFDataSet
 from carpedm.data.io import CSVParser, DataWriter
 from carpedm.data.lang import JapaneseUnicodes, Vocabulary, code2char
-from carpedm.data.viewer import Viewer, font
 
 
 DEFAULT_SEED = 123456
@@ -392,6 +391,8 @@ class MetaLoader(object):
             warnings.warn("The view_images method is not available."
                           "Please install matplotlib if you wish to use it.")
             return
+        else:
+            from carpedm.data.viewer import Viewer, font
 
         self._check_subset(subset)
         Viewer(self._image_meta[subset], shape)
@@ -421,7 +422,14 @@ class MetaLoader(object):
 
         if 'frequency' in which_stats:
 
-            import matplotlib.pyplot as plt
+            try:
+                import matplotlib.pyplot as plt
+            except ImportError:
+                warnings.warn("The view_images method is not available."
+                              "Please install matplotlib if you wish to use it.")
+                return
+            else:
+                from carpedm.data.viewer import font
 
             rr = len(self.reserved_tokens)
             start = rr if id_start is None else id_start
