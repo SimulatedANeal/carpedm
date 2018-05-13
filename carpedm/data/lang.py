@@ -16,8 +16,8 @@ import os
 def code2hex(code):
     """Returns hex integer for a unicode string."""
     if 'U+' in code:
-        unicode = code.lstrip('U+')
-    return int(unicode, 16)
+        code = code.lstrip('U+')
+    return int(code, 16)
 
 
 def code2char(code):
