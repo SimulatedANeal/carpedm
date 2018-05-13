@@ -20,6 +20,7 @@ Documentation
     :maxdepth: 1
     :caption: Other
 
+    benchmarks
     contribution
     conduct
     license

@@ -52,7 +52,7 @@ def plot_confusion_matrix(cm, classes,
     """
     import matplotlib.pyplot as plt
     from carpedm.data.viewer import font
-
+    
     if normalize:
         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
         print("Normalized confusion matrix")

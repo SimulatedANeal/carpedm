@@ -165,7 +165,7 @@ class TFDataSet(DataProvider):
         if self.sparse_labels:
             tensor_dict['image/seq/char/id_sparse'] = tf.serialize_sparse(
                 ops.sparsify_label(tensor_dict['image/seq/char/id'],
-                                   tensor_dict['image/num_chars'])
+                                   tensor_dict['image/char/count'])
             )
 
         # if distort: image = distort_image(image)

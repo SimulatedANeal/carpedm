@@ -11,9 +11,10 @@
 import tensorflow as tf
 
 from carpedm.models.generic import TFModel
+from carpedm.util import registry
 from carpedm.nn import util
 
-
+@registry.register_model
 class CNN(TFModel):
     """Modular convolutional neural network layer class."""
 
@@ -80,9 +81,7 @@ class CNN(TFModel):
                 p += 1
         return name[:-1]
 
-    def _forward_pass(self, features, data_format, axes_order,
-                      is_training, reuse):
-        x = features['image/data']
+    def _forward_pass(self, x, data_format, axes_order, is_training, reuse):
         x = tf.transpose(x, axes_order) if axes_order else x
         p = 0
         for c in range(len(self._kernels)):
