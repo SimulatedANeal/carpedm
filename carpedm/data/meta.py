@@ -10,8 +10,6 @@ This module loads and manages metadata stored as CSV files in the
 raw data directory.
 
 Attributes:
-    FONT_FILE (str): Filename of ``.ttc`` file for displaying Japanese
-        character fonts.
     DEFAULT_SEED (int): The default random seed.
 
 Examples:
@@ -64,7 +62,6 @@ Todo:
     * Sort characters by reading order, i.e. character ID.
     * Rewrite data as CSV following original format
     * Data generator option instead of writing data.
-    * Old file cleanup if files overwritten in ``generate_dataset``
     * Output formats and/or generator return types for ``generate_dataset``
         * numpy
         * hdf5
@@ -83,7 +80,6 @@ import json
 import os
 import random
 import shutil
-import sys
 import warnings
 from collections import Counter
 
@@ -93,10 +89,9 @@ from carpedm.data.download import get_books_list
 from carpedm.data.providers import TFDataSet
 from carpedm.data.io import CSVParser, DataWriter
 from carpedm.data.lang import JapaneseUnicodes, Vocabulary, code2char
-from carpedm.data.ops import in_region
+from carpedm.data.viewer import Viewer, font
 
-FONT_FILE = "HiraginoMaruGothic.ttc"
-FONT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), FONT_FILE)
+
 DEFAULT_SEED = 123456
 
 
@@ -167,13 +162,6 @@ def _num_examples_per_epoch(data_dir):
             return json.load(fp)
     else:
         return {'train': None, 'dev': None, 'test': None}
-
-
-def font(size):
-    """Fonts helper for matplotlib."""
-    from matplotlib.font_manager import FontProperties
-
-    return FontProperties(fname=FONT_PATH, size=size)
 
 
 class MetaLoader(object):
@@ -375,7 +363,6 @@ class MetaLoader(object):
 
         Returns:
             tuple: Maximum size (height, width)
-
         """
         if subset:
             self._check_subset(subset)
@@ -390,9 +377,6 @@ class MetaLoader(object):
     def view_images(self, subset, shape=None):
         """View and explore images in a data subset.
 
-        References:
-            Annotation code based on Stack Overflow answer `here`_.
-
         Args:
             subset (str): The subset to iterate through.
                 One of {'train', 'dev', 'test'}.
@@ -401,145 +385,16 @@ class MetaLoader(object):
                 more information.
 
         .. _here: https://stackoverflow.com/a/47166787
-
         """
         try:
             import matplotlib.pyplot as plt
-            import matplotlib.patches as patches
-            from matplotlib.widgets import Button, TextBox, CheckButtons
         except ImportError:
             warnings.warn("The view_images method is not available."
                           "Please install matplotlib if you wish to use it.")
             return
 
         self._check_subset(subset)
-        images = self._image_meta[subset]
-        n = len(images)
-
-        class Index(object):
-            ind = 0
-            fig, ax = plt.subplots()
-
-            def __init__(self):
-                self.show_char_bbox = False
-                self.show_line_bbox = False
-
-                plt.subplots_adjust(bottom=0.2)
-                self.fig.canvas.mpl_connect("motion_notify_event", self.hover)
-                self.show_image()
-
-            def next(self, event):
-                self.ind += 1
-                self.show_image()
-
-            def prev(self, event):
-                self.ind -= 1
-                self.show_image()
-
-            def submit(self, text):
-                try:
-                    i = int(text)
-                except ValueError:
-                    self.ax.text(0.075, 0.1, "Please enter a valid integer.",
-                                 transform=plt.gcf().transFigure)
-                else:
-                    i = i % n
-                    self.ind = i
-                    self.show_image()
-
-            def show_image(self):
-                self.ax.clear()
-                index = self.ind % n
-                meta = images[index]
-                image = meta.load_image(shape)
-                if len(image.shape) == 2:
-                    self.ax.imshow(image, cmap='gray')
-                else:
-                    self.ax.imshow(image)
-
-                if self.show_char_bbox:
-                    for b in meta.char_bboxes:
-                        rect = patches.Rectangle((b.xmin, b.ymin),
-                                                 b.xmax - b.xmin,
-                                                 b.ymax - b.ymin,
-                                                 linewidth=2, edgecolor='g',
-                                                 facecolor='none')
-                        self.ax.add_patch(rect)
-
-                if self.show_line_bbox:
-                    for b in meta.line_bboxes:
-                        rect = patches.Rectangle((b.xmin, b.ymin),
-                                                 b.xmax - b.xmin,
-                                                 b.ymax - b.ymin,
-                                                 linewidth=2, edgecolor='b',
-                                                 facecolor='none')
-                        self.ax.add_patch(rect)
-
-                self.ax.text(0.3, 0.9,
-                             "{}/{} ({})".format(
-                                 index, n - 1, meta.filepath.split('/')[-1]),
-                             transform=plt.gcf().transFigure)
-
-                plt.draw()
-
-            def hover(self, event):
-                self.ax.texts = [self.ax.texts[0]]  # only keep index
-                ind = self.ind % n
-                if event.inaxes == self.ax:
-                    bbs = images[ind].char_bboxes
-                    if self.show_line_bbox:
-                        lines = images[ind].line_bboxes
-                        chars_show = []
-                        for bb in lines:
-                            if in_region((event.xdata, event.ydata), bb):
-                                chars_show.insert(
-                                    0, [i for i in range(len(bbs))
-                                        if in_region(bbs[i], bb)]
-                                )
-                    else:
-                        chars_show = [[
-                            i for i in range(len(bbs))
-                            if in_region((event.xdata, event.ydata), bbs[i])
-                        ]]
-                    # Update annotation
-                    if len(chars_show) > 0:
-                        all_chars = images[ind].char_labels
-                        for i in range(len(chars_show)):
-                            for j in chars_show[i]:
-                                x = self.ax.get_xlim()[1] + 20 + i * 25
-                                y = ((bbs[j].ymax - bbs[j].ymin) / 2.
-                                     + bbs[j].ymin)
-                                self.ax.text(x, y,
-                                             code2char(all_chars[j]),
-                                             color='black',
-                                             fontproperties=font(12))
-                        self.ax.figure.canvas.draw_idle()
-                else:
-                    self.ax.figure.canvas.draw_idle()
-
-            def update_bboxes(self, label):
-                if label == 'show character bboxes':
-                    self.show_char_bbox = not self.show_char_bbox
-                elif label == 'show line bboxes':
-                    self.show_line_bbox = not self.show_line_bbox
-                self.show_image()
-
-        callback = Index()
-        axtext = plt.axes([0.59, 0.05, 0.1, 0.075])
-        axprev = plt.axes([0.7, 0.05, 0.1, 0.075])
-        axnext = plt.axes([0.81, 0.05, 0.1, 0.075])
-        axchec = plt.axes([0.1, 0.05, 0.35, 0.075])
-        entry = TextBox(axtext, 'Go to', initial="0")
-        entry.on_submit(callback.submit)
-        bnext = Button(axnext, 'Next')
-        bnext.on_clicked(callback.next)
-        bprev = Button(axprev, 'Previous')
-        bprev.on_clicked(callback.prev)
-        check = CheckButtons(axchec,
-                             ('show character bboxes', 'show line bboxes'),
-                             (False, False))
-        check.on_clicked(callback.update_bboxes)
-        plt.show()
+        Viewer(self._image_meta[subset], shape)
 
     def data_stats(self,
                    which_sets=('train', 'dev', 'test'),
@@ -558,7 +413,6 @@ class MetaLoader(object):
                 visualizations.
             id_stop (int): highest character ID to include in
                 visualizations.
-
         """
 
         def all_labels_flat(sub):
@@ -659,7 +513,6 @@ class MetaLoader(object):
         Args:
             csvfn (str): Path to csvfile to parse.
             bib_id (str): Bibliography id.
-
         """
         encodings_check = ['shift_jis', 'shift_jisx0213', 'cp932', 'utf8']
 
@@ -703,7 +556,6 @@ class MetaLoader(object):
         Args:
             bib_meta (dict): Dictionary of lists of Image namedtuples,
                 one for each bibliography entry.
-
         """
         total_examples = sum(map(lambda x: len(x), bib_meta.values()))
 

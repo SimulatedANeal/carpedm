@@ -13,16 +13,24 @@ import abc
 import os
 
 
-def code2hex(unicode):
+def code2hex(code):
     """Returns hex integer for a unicode string."""
-    if 'U+' in unicode:
-        unicode = unicode.lstrip('U+')
+    if 'U+' in code:
+        unicode = code.lstrip('U+')
     return int(unicode, 16)
 
 
-def code2char(unicode):
+def code2char(code):
     """Returns the unicode string for the character."""
-    return chr(code2hex(unicode))
+    try:
+        char = chr(code2hex(code))
+    except ValueError:
+        char = code
+    return char
+
+def char2code(unicode):
+    """Returns the ASCII code for a unicode character."""
+    pass
 
 
 class CharacterSet(object):
@@ -189,12 +197,17 @@ class Vocabulary(object):
             self._vocab[self.UNK] = len(self._vocab)
         self._rev_vocab = {idx: key for key, idx in self._vocab.items()}
 
-    def save(self, out_dir):
-        vocab_sorted = [self._rev_vocab[idx]
-                        for idx in sorted(self._rev_vocab.keys())]
+    def save(self, out_dir, as_unicode=False):
+        types = self.types(as_unicode)
         with open(os.path.join(out_dir, 'vocab.txt'), 'w') as f:
-            for token in vocab_sorted:
-                f.write(token + '\n')
+            for t in types:
+                f.write(t + '\n')
+
+    def types(self, as_unicode=False):
+        types = [code2char(self._rev_vocab[idx]) if as_unicode
+                 else self._rev_vocab[idx]
+                 for idx in sorted(self._rev_vocab.keys())]
+        return types
 
     def char_to_id(self, char):
         """Returns the integer id of a character string."""
