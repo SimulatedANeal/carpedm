@@ -28,9 +28,10 @@ def code2char(code):
         char = code
     return char
 
-def char2code(unicode):
-    """Returns the ASCII code for a unicode character."""
-    pass
+
+# def char2code(unicode):
+#     """Returns the ASCII code for a unicode character."""
+#     pass
 
 
 class CharacterSet(object):
