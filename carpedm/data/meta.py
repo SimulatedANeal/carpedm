@@ -71,7 +71,6 @@ Todo:
         * Fix bounding box display error in ``view_images``
         * specify number of character type in sequence
             * e.g. 2 Kanji, 1 kana
-        * Filter examples by image in which they appear
         * Instead of padding, fill specified shape with surrounding
 """
 import itertools

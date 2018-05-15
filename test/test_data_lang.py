@@ -6,7 +6,8 @@
 
 import unittest
 
-from carpedm.data.lang import Vocabulary, JapaneseUnicodes, code2char
+from carpedm.data.lang import Vocabulary, JapaneseUnicodes
+from carpedm.data.lang import code2hex, code2char, char2code
 
 
 class VocabularyTestCase(unittest.TestCase):
@@ -84,6 +85,11 @@ class JapaneseUnicodeTestCase(unittest.TestCase):
 
     def test_code_to_char(self):
         self.assertEqual(code2char('U+3400'), u'\u3400')
+
+    def test_char_to_code(self):
+        self.assertEqual(char2code(u'\u3400'), 'U+3400')
+        self.assertEqual(char2code('さ'), 'U+3055')
+        self.assertEqual(char2code('c'), 'U+0063')
 
 
 if __name__ == '__main__':

@@ -14,10 +14,32 @@ import os
 
 
 def code2hex(code):
-    """Returns hex integer for a unicode string."""
+    """Returns hex integer for a unicode string.
+
+    The argument code could either be an ascii representation,
+    e.g. U+3055, or a unicode character.
+
+    Args:
+        code (str): Code to convert.
+
+    Returns:
+        int:
+    """
+    try:
+        _ = code.encode('ascii')
+    except UnicodeEncodeError:
+        code = char2code(code)
+
     if 'U+' in code:
         code = code.lstrip('U+')
-    return int(code, 16)
+
+    try:
+        result = int(code, 16)
+    except ValueError:
+        # Not a number, so probably just a raw ascii character.
+        result = int(char2code(code).lstrip('U+'), 16)
+
+    return result
 
 
 def code2char(code):
@@ -29,9 +51,16 @@ def code2char(code):
     return char
 
 
-# def char2code(unicode):
-#     """Returns the ASCII code for a unicode character."""
-#     pass
+def char2code(unicode):
+    """Returns the ASCII code for a unicode character.
+
+    Args:
+        unicode (str):
+
+    Raises:
+        TypeError: string is length two.
+    """
+    return "U+{0:04x}".format(ord(unicode))
 
 
 class CharacterSet(object):
@@ -43,30 +72,44 @@ class CharacterSet(object):
         """Initializer
 
         Args:
-            charset (str): ID for types of characters to include.
+            charset (:obj:`str` or :obj:`list` of :obj:`str`):
+                ID for types of characters to include, if string, or
+                a list of characters to include, either as ascii codes,
+                e.g. U+3055, or unicode characters.
         """
         self._ranges = self._unicode_ranges(charset)
 
-    @abc.abstractmethod
+    @property
+    def presets(self):
+        """Pre-defined character sets.
+
+        Returns:
+            :obj:`list` of :obj:`str`: Character set IDs.
+        """
+        return []
+
     def _unicode_ranges(self, charset):
         """Returns appropriate unicode ranges for specified ``charset``.
 
         Args:
-            charset (str): ID of character set to use.
+            charset (str or :obj:`list` of :obj:`str`):
+                ID of character set to use.
 
         Returns:
             :obj:`list` of :obj:`tuple`: Unicode ranges [(low, high)]
         """
+        return [(code2hex(c),) for c in charset]
 
     def in_charset(self, unicode):
         """Check if a character is in the defined character set.
 
         Args:
             unicode (str): String representation of unicode value.
-
         """
         hexcode = code2hex(unicode)
-        if any([r[0] <= hexcode <= r[1] for r in self._ranges]):
+        if any([(len(r) == 1 and hexcode == r[0]) or
+                (len(r) == 2 and r[0] <= hexcode <= r[1])
+                for r in self._ranges]):
             return True
         else:
             return False
@@ -82,18 +125,17 @@ class JapaneseUnicodes(CharacterSet):
 
     References:
         [1] http://www.unicode.org/charts/
-
     """
 
     PUNCTUATION = [
         (int('25a0', 16), int('25ff', 16)),  # square
         (int('25b2', 16), int('25b3', 16)),  # triangle
         (int('25cb', 16), int('25cf', 16)),  # circle
-        (int('25ef', 16), int('25ef', 16)),  # big circle
+        (int('25ef', 16),),  # big circle
         (int('3200', 16), int('32ff', 16)),  # filled big circles
         (int('3000', 16), int('303f', 16)),  # CJK symbols, punctuation
         (int('3099', 16), int('309e', 16)),  # voicing, iteration marks
-        (int('30a0', 16), int('30a0', 16)),  # double hyphen
+        (int('30a0', 16),),  # double hyphen
         (int('30fb', 16), int('30fe', 16)),  # dot, prolonged, iteration
         (int('ff5b', 16), int('ff64', 16)),  # brackets, halfwidth punctuation
         (int('ffed', 16), int('ffee', 16))  # halfwidth square, circle
@@ -101,12 +143,12 @@ class JapaneseUnicodes(CharacterSet):
 
     HIRAGANA = [
         (int('3040', 16), int('3096', 16)),
-        (int('309f', 16), int('309f', 16))  # より
+        (int('309f', 16),)  # より
     ]
 
     KATAKANA = [
         (int('30a1', 16), int('30fa', 16)),
-        (int('30ff', 16), int('30ff', 16)),  # コト
+        (int('30ff', 16),),  # コト
         (int('ff65', 16), int('ff9d', 16))  # halfwidth
     ]
 
@@ -130,26 +172,35 @@ class JapaneseUnicodes(CharacterSet):
 
     ALL = HIRAGANA + KATAKANA + KANJI + PUNCTUATION + MISC
 
+    SETS = {
+        'hiragana': HIRAGANA,
+        'katakana': KATAKANA,
+        'kana': KANA,
+        'kanji': KANJI,
+        'punct': PUNCTUATION,
+        'misc': MISC,
+        'all': ALL
+    }
+
     def __init__(self, charset):
         super(JapaneseUnicodes, self).__init__(charset)
 
+    def presets(self):
+        return self.SETS.keys()
+
     def _unicode_ranges(self, charset):
-        if charset == 'all':
-            ranges = JapaneseUnicodes.ALL
-        else:
+        if isinstance(charset, str):
             ranges = []
-            if 'hiragana' in charset:
-                ranges += JapaneseUnicodes.HIRAGANA
-            elif 'katakana' in charset:
-                ranges += JapaneseUnicodes.KATAKANA
-            elif 'kana' in charset:
-                ranges += JapaneseUnicodes.KANA
-            if 'kanji' in charset:
-                ranges += JapaneseUnicodes.KANJI
-            if 'punct' in charset:
-                ranges += JapaneseUnicodes.PUNCTUATION
-            if 'misc' in charset:
-                ranges += JapaneseUnicodes.MISC
+            for k, s in self.SETS.items():
+                if k == 'kana':
+                    if k in charset and not 'katakana' in charset:
+                        ranges += s
+                else:
+                    if k in charset:
+                        ranges += s
+        else:
+            ranges = super(JapaneseUnicodes, self)._unicode_ranges(charset)
+
         assert len(ranges) > 0, "Invalid character set."
         return ranges
 

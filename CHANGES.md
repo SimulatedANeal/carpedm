@@ -2,6 +2,10 @@
 
 Notable changes between releases.
 
+## 0.1.5 (2018-05-15)
+* Write parent image coordinate info when saving dataset as raw images.
+* Can now provide list of characters for `charset` argument to `MetaLoader`.
+
 ## 0.1.4 (2018-05-13)
 * Improved `view_images` UI
     * Separated toolbar
