@@ -29,6 +29,7 @@ Todo:
     * Tests
         * DataWriter
         * CSVParser
+    * Recover bounding box
 
 """
 import csv
@@ -79,7 +80,6 @@ class DataWriter(object):
             bbox (str or None): If not None, include bbox in features
                 as unit (e.g. 'pixel', 'ratio' [of image]))
             subdirs (bool): Generate a subdirectory for each class.
-
         """
 
         self._writer_types = {
@@ -218,25 +218,44 @@ class DataWriter(object):
 
         os.makedirs(fname_prefix, exist_ok=True)
 
-        csvfile = open(
-            os.path.join(fname_prefix, 'targets_{}.csv'.format(index)),
-            'w+')
-        fieldnames = [
-            'file_id',
-            'image_id',
-            'unicodes',
-            'bounding_boxes (x:y:h:w)'
-        ]
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter=',')
-        writer.writeheader()
+        def create_csv(name, fields):
+            csvfile = open(
+                os.path.join(fname_prefix, '{}_{}.csv'.format(name, index)),
+                'w+')
+            writer = csv.DictWriter(csvfile, fieldnames=fields, delimiter=',')
+            writer.writeheader()
+            return csvfile, writer
+
+        tfile, twriter = create_csv(
+            name='targets', fields=['file_id',
+                                    'unicodes',
+                                    'bounding_boxes (x:y:h:w)',]
+        )
+
+        pfile, pwriter = create_csv(
+            name='parents', fields=['file_id',
+                                    'image_id',
+                                    'X',
+                                    'Y',
+                                    'Width',
+                                    'Height']
+        )
 
         def write_features(meta, feats, count):
-            row_dict = dict()
-            row_dict['image_id'] = meta.filepath.split('/')[-1].strip('.jpg')
+            target_dict = dict()
+            parent_dict = dict()
 
             im = Image.fromarray(feats['image/data'])
             im_id = '{}_{}'.format(index, count)
-            row_dict['file_id'] = im_id
+            target_dict['file_id'] = im_id
+            parent_dict['file_id'] = im_id
+
+            # Parent meta data
+            parent_dict['image_id'] = meta.filepath.split('/')[-1].strip('.jpg')
+            parent_dict['X'] = meta.xmin
+            parent_dict['Y'] = meta.ymin
+            parent_dict['Width'] = meta.width
+            parent_dict['Height'] = meta.height
 
             if self._char and self._label:
                 label = "_".join([self._vocab.id_to_char(c)
@@ -247,7 +266,7 @@ class DataWriter(object):
                     fname = os.path.join(dir_img, im_id + image_format)
                 else:
                     fname = os.path.join(fname_prefix, im_id + image_format)
-                row_dict['unicodes'] = label
+                target_dict['unicodes'] = label
             else:
                 fname = os.path.join(fname_prefix, im_id + image_format)
 
@@ -257,7 +276,7 @@ class DataWriter(object):
                 xmax = feats['image/seq/char/bbox/xmax']
                 ymax = feats['image/seq/char/bbox/ymax']
 
-                row_dict['bounding_boxes (x:y:h:w)'] = "_".join(
+                target_dict['bounding_boxes (x:y:h:w)'] = "_".join(
                     ["{}:{}:{}:{}".format(xmin[i],
                                           ymin[i],
                                           xmax[i] - xmin[i],
@@ -266,7 +285,8 @@ class DataWriter(object):
                 )
 
             im.save(fname)
-            writer.writerow(row_dict)
+            twriter.writerow(target_dict)
+            pwriter.writerow(parent_dict)
 
         written_count = 0
         first, last = ranges[index]
@@ -288,7 +308,8 @@ class DataWriter(object):
 
         num_examples[index] = written_count
 
-        csvfile.close()
+        tfile.close()
+        pfile.close()
 
 
 class CSVParser(object):
