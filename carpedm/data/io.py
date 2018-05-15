@@ -29,8 +29,6 @@ Todo:
     * Tests
         * DataWriter
         * CSVParser
-    * Recover bounding box
-
 """
 import csv
 import functools
