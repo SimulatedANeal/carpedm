@@ -17,7 +17,7 @@ def code2hex(code):
     """Returns hex integer for a unicode string.
 
     The argument code could either be an ascii representation,
-    e.g. U+3055, or a unicode character.
+    (e.g. U+3055, <UNK>) or a unicode character.
 
     Args:
         code (str): Code to convert.
@@ -29,15 +29,14 @@ def code2hex(code):
         _ = code.encode('ascii')
     except UnicodeEncodeError:
         code = char2code(code)
-
-    if 'U+' in code:
-        code = code.lstrip('U+')
+    # Code is either 'U+XXXX(X)' code or unknown format.
+    code = code.lstrip('U+') if 'U+' in code else code
 
     try:
         result = int(code, 16)
     except ValueError:
         # Not a number, so probably just a raw ascii character.
-        result = int(char2code(code).lstrip('U+'), 16)
+        result = code
 
     return result
 
@@ -46,7 +45,7 @@ def code2char(code):
     """Returns the unicode string for the character."""
     try:
         char = chr(code2hex(code))
-    except ValueError:
+    except (ValueError, TypeError):
         char = code
     return char
 
@@ -60,7 +59,11 @@ def char2code(unicode):
     Raises:
         TypeError: string is length two.
     """
-    return "U+{0:04x}".format(ord(unicode))
+    try:
+        code = "U+{0:04x}".format(ord(unicode))
+    except TypeError:
+        code = unicode
+    return code
 
 
 class CharacterSet(object):
@@ -228,6 +231,7 @@ class Vocabulary(object):
 
         """
         self._vocab = {}
+        self._reserved = reserved
 
         for ix, char in enumerate(vocab):
             self._vocab[char] = ix
@@ -278,3 +282,7 @@ class Vocabulary(object):
     def get_num_classes(self):
         """Returns number of classes, includes <UNK>."""
         return len(self._vocab)
+
+    def get_num_reserved(self):
+        """Returns number of reserved IDs."""
+        return len(self._reserved)
