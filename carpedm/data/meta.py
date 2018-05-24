@@ -87,7 +87,8 @@ import numpy as np
 from carpedm.data.download import get_books_list
 from carpedm.data.providers import TFDataSet
 from carpedm.data.io import CSVParser, DataWriter
-from carpedm.data.lang import JapaneseUnicodes, Vocabulary, code2char
+from carpedm.data.lang import CharacterSet, JapaneseUnicodes
+from carpedm.data.lang import Vocabulary, code2char
 
 
 DEFAULT_SEED = 123456
@@ -173,7 +174,7 @@ class MetaLoader(object):
                  vocab_size=None,
                  min_freq=0,
                  reserved=('<PAD>', '<GO>', '<END>', '<UNK>'),
-                 charset='all',
+                 charset=JapaneseUnicodes('all'),
                  image_scope='char',
                  seq_len=None,
                  seq_maxlen=None,
@@ -201,7 +202,7 @@ class MetaLoader(object):
                 e.g. ("<PAD>", "<S>", "<UNK>", "</S>").
                 Note: Indices of token in given tuple will be used
                 for its corresponding integer ID.
-            charset (str): ID for the character set to use.
+            charset (CharacterSet): The character set.
             image_scope (str): Image problem scope.
             seq_len (None or int): (Minimum) number of characters to
                 include in image if image_scope is 'seq'. If seq_maxlen
@@ -230,8 +231,7 @@ class MetaLoader(object):
         self.reserved_tokens = reserved
         self.image_scope = image_scope
         self._dev_factor = dev_factor
-        self._charset = charset
-        self._C = JapaneseUnicodes(self._charset)
+        self._C = charset
         self._V = vocab_size
         self._min_freq = min_freq
         self._seq_len = seq_len
