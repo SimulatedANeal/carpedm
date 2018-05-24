@@ -17,6 +17,7 @@ import re
 import tensorflow as tf
 from tensorflow.contrib.training import GreedyLoadBalancingStrategy
 
+from carpedm.data.lang import CharacterSet, JapaneseUnicodes
 from carpedm.data.meta import MetaLoader
 from carpedm.data.ops import shard_batch
 from carpedm.nn.util import TOWER_NAME
@@ -172,7 +173,7 @@ class Task(object):
     def character_set(self):
         """The Japanese characters (e.g. kana, kanji) of interest.
 
-        Returned value may include the following component sets:
+        Preset character sets may include the following component sets:
 
             * hiragana
             * katakana
@@ -182,10 +183,10 @@ class Task(object):
             * misc
 
         Returns:
-            str: ID for the character set
+            CharacterSet: The character set.
 
         """
-        return 'all'
+        return JapaneseUnicodes(charset='all')
 
     @property
     def reserved(self):
@@ -326,7 +327,7 @@ class Task(object):
     def task_id(self):
         num_classes = self._meta.vocab.get_num_classes() - len(self.reserved)
         return "{}_{}-{}".format(self.__class__.__name__,
-                                 self.character_set,
+                                 self.character_set.name,
                                  num_classes)
 
     def get_class_labels(self, as_unicode=False):
