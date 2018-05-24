@@ -82,13 +82,11 @@ import shutil
 import warnings
 from collections import Counter
 
-import numpy as np
-
 from carpedm.data.download import get_books_list
 from carpedm.data.io import CSVParser, DataWriter
 from carpedm.data.lang import JapaneseUnicodes, Vocabulary, code2char
 from carpedm.data.providers import TFDataSet
-from carpedm.data.stats import majority, ratio
+from carpedm.data.stats import majority, ratio, ClassCounts
 
 
 DEFAULT_SEED = 123456
@@ -400,20 +398,17 @@ class MetaLoader(object):
     def data_stats(self,
                    which_sets=('train', 'dev', 'test'),
                    which_stats=('majority', 'frequency', 'unknowns'),
-                   save_figures=False,
-                   id_start=None,
-                   id_stop=None,):
+                   save_dir=None, include=(None, None)):
         """Print or show data statistics.
 
         Args:
             which_sets (tuple): Data subsets to see statistics for.
             which_stats (tuple): Statistics to view. Default gives all
                 options.
-            save_figures (bool): Save figures when possible.
-            id_start (int): lowest character ID to include in
-                visualizations.
-            id_stop (int): highest character ID to include in
-                visualizations.
+            save_dir (str): If not None, save figures/files to this
+                directory.
+            include (tuple): Include class IDs from this range.
+
         """
 
         def alf(metadata):
@@ -421,67 +416,14 @@ class MetaLoader(object):
             return [u for img in metadata for u in img.char_labels]
 
         if 'frequency' in which_stats:
-
-            try:
-                import matplotlib.pyplot as plt
-            except ImportError:
-                warnings.warn("Plotting is not available."
-                              "Please install matplotlib if you wish to use it.")
-                for subset in which_sets:
-                    print("{} Token Frequencies\n{}".format(subset, '-' * 22))
-                    counts = Counter(alf(self._image_meta[subset]))
-                    for t in self.vocab.types():
-                        print("{0} ({1}): {2}".format(t,
-                                                      code2char(t),
-                                                      counts[t]))
-            else:
-                from carpedm.data.viewer import font
-
-                rr = len(self.reserved_tokens)
-                start = rr if id_start is None else id_start
-                stop = self.vocab.get_num_classes() if id_stop is None else id_stop
-                nn = stop - start + 1
-                colors = ['green', 'blue', 'red']
-                fig, ax = plt.subplots()
-                rects = []
-                bar_width = 1.0 / (len(which_sets) + 1)
-                # center groups of bars
-                ind = np.arange(nn)
-                centers = ind + bar_width * len(which_sets) / 2.
-                max_count = 0
-                for i in range(len(which_sets)):
-                    chars = [self.vocab.char_to_id(u)
-                             for u in all_labels_flat(which_sets[i])]
-                    chars = [cid for cid in chars if start <= cid <= stop]
-                    counts = Counter(chars)
-                    x = ind + i * bar_width
-                    y = [0] * nn
-                    for cid, count in counts.items():
-                        if count > max_count:
-                            max_count = count
-                        y[cid - start] = count
-                    rects.append(ax.bar(x, y, bar_width, color=colors[i]))
-                char_list = [self.vocab.id_to_char(i)
-                             for i in range(start, stop + 1)]
-                if start < rr:
-                    char_list = char_list[:rr - start] + list(
-                        map(code2char, char_list[rr - start:])
-                    )
-                else:
-                    char_list = map(code2char, char_list)
-
-                ax.set_ylabel("Counts")
-                ax.set_ylim([0, max_count])
-                ax.set_title("Characters {0}-{1} Relative Frequency".format(
-                    start, stop))
-                ax.set_xlabel("Characters")
-                ax.set_xticks(centers)
-                ax.set_xticklabels(char_list, fontproperties=font(10))
-                ax.legend([r[0] for r in rects], which_sets)
-                ax.autoscale()
-                if save_figures:
-                    plt.savefig("{0}-{1}_frequency.svg".format(start, stop))
-                plt.show()
+            counts = ClassCounts()
+            for i in range(len(which_sets)):
+                name = which_sets[i]
+                data = self._image_meta[name]
+                if len(data) > 0:
+                    counts.add_dataset(data=alf(data), label=name)
+            counts.plot_counts(vocab=self.vocab, include=include,
+                               save_dir=save_dir)
 
         if 'majority' in which_stats:
             for primary in which_sets:

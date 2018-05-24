@@ -231,6 +231,7 @@ class Vocabulary(object):
 
         """
         self._vocab = {}
+        self._reserved = reserved
 
         for ix, char in enumerate(vocab):
             self._vocab[char] = ix
@@ -281,3 +282,7 @@ class Vocabulary(object):
     def get_num_classes(self):
         """Returns number of classes, includes <UNK>."""
         return len(self._vocab)
+
+    def get_num_reserved(self):
+        """Returns number of reserved IDs."""
+        return len(self._reserved)
