@@ -15,6 +15,7 @@ import abc
 
 import tensorflow as tf
 
+from carpedm.data.lang import JapaneseUnicodes
 from carpedm.tasks.generic import Task
 from carpedm.util import registry
 from carpedm.util.eval import confusion_matrix_metric
@@ -76,7 +77,7 @@ class OCRSingleKana(OCRTask):
 
     @property
     def character_set(self):
-        return 'kana'
+        return JapaneseUnicodes('kana')
 
     def results(self, loss, tower_features, tower_preds, tower_targets,
                 is_training):
@@ -129,7 +130,7 @@ class OCRSeqKana3(OCRTask):
 
     @property
     def character_set(self):
-        return 'kana'
+        return JapaneseUnicodes('kana')
 
     @property
     def image_scope(self):
