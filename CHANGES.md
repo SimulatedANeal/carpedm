@@ -2,6 +2,10 @@
 
 Notable changes between releases.
 
+## 0.1.6 (2018-05-24)
+* Dataset statistics refactor
+* Changed `charset` argument to `MetaLoader` to type `CharacterSet`
+
 ## 0.1.5 (2018-05-15)
 * Write parent image coordinate info when saving dataset as raw images.
 * Can now provide list of characters for `charset` argument to `MetaLoader`.
