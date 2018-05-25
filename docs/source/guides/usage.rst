@@ -34,6 +34,10 @@ For example:
     :language: python
     :lines: 26-31
 
+.. note::
+
+    Currently, ``view_images`` does not work in a Jupyter notebook instance.
+
 .. _training:
 
 Training a Model

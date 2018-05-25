@@ -18,9 +18,9 @@ import carpedm as dm
 
 
 # Create objects for storing meta data
-single_kana = dm.data.MetaLoader(data_dir=dm.data.SAMPLE, image_scope='char', charset='kana')
-kanji_seq = dm.data.MetaLoader(data_dir=dm.data.SAMPLE, image_scope='seq', seq_len=3, charset='kanji')
-full_page = dm.data.MetaLoader(data_dir=dm.data.SAMPLE, image_scope='page', charset='all')
+single_kana = dm.data.MetaLoader(data_dir=dm.data.sample, image_scope='char', charset=dm.data.CharacterSet('kana'))
+kanji_seq = dm.data.MetaLoader(data_dir=dm.data.sample, image_scope='seq', seq_len=3, charset=dm.data.CharacterSet('kanji'))
+full_page = dm.data.MetaLoader(data_dir=dm.data.sample, image_scope='page', charset=dm.data.CharacterSet('all'))
 
 # View images
 single_kana.view_images(subset='train', shape=(64,64))
