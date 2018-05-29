@@ -71,7 +71,7 @@ class CharacterSet(object):
 
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, charset):
+    def __init__(self, charset, name=None):
         """Initializer
 
         Args:
@@ -81,6 +81,13 @@ class CharacterSet(object):
                 e.g. U+3055, or unicode characters.
         """
         self._ranges = self._unicode_ranges(charset)
+        if name:
+            self.name = name
+        elif isinstance(charset, str):
+            self.name = charset
+        else:
+            assert isinstance(charset, list)
+            self.name = 'chars'
 
     @property
     def presets(self):
